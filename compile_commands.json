@@ -1,0 +1,22 @@
+[
+{
+  "directory": "/home/fildo/Zad4/build/eigen_example",
+  "command": "/usr/bin/c++  -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"eigen_example\\\" -I/home/fildo/Zad4/src/eigen_example/include -I/opt/ros/noetic/include -I/opt/ros/noetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/usr/include/eigen3    -o CMakeFiles/eigen_example.dir/src/eigen_example.cpp.o -c /home/fildo/Zad4/src/eigen_example/src/eigen_example.cpp",
+  "file": "/home/fildo/Zad4/src/eigen_example/src/eigen_example.cpp"
+},
+{
+  "directory": "/home/fildo/Zad4/build/robot/abb_irb4600_60_205_ikfast",
+  "command": "/usr/bin/c++  -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"abb_irb4600_60_205_ikfast\\\" -Dabb_irb4600_60_205_manipulator_moveit_ikfast_plugin_EXPORTS -I/opt/ros/noetic/include -I/opt/ros/noetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/usr/include/eigen3 -I/usr/include/bullet -I/home/fildo/Zad4/src/robot/abb_irb4600_60_205_ikfast/include  -fPIC   -std=c++11 -o CMakeFiles/abb_irb4600_60_205_manipulator_moveit_ikfast_plugin.dir/src/abb_irb4600_60_205_manipulator_ikfast_moveit_plugin.cpp.o -c /home/fildo/Zad4/src/robot/abb_irb4600_60_205_ikfast/src/abb_irb4600_60_205_manipulator_ikfast_moveit_plugin.cpp",
+  "file": "/home/fildo/Zad4/src/robot/abb_irb4600_60_205_ikfast/src/abb_irb4600_60_205_manipulator_ikfast_moveit_plugin.cpp"
+},
+{
+  "directory": "/home/fildo/Zad4/build/ik_solver_example",
+  "command": "/usr/bin/c++  -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"ik_solver_example\\\" -I/home/fildo/Zad4/src/ik_solver_example/include -I/opt/ros/noetic/include -I/opt/ros/noetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/usr/include/eigen3 -I/usr/include/bullet    -o CMakeFiles/ik_solver_example.dir/src/ik_solver_example.cpp.o -c /home/fildo/Zad4/src/ik_solver_example/src/ik_solver_example.cpp",
+  "file": "/home/fildo/Zad4/src/ik_solver_example/src/ik_solver_example.cpp"
+},
+{
+  "directory": "/home/fildo/Zad4/build/trajectory_visualization",
+  "command": "/usr/bin/c++  -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"trajectory_visualization\\\" -I/home/fildo/Zad4/src/trajectory_visualization/include -I/opt/ros/noetic/include -I/opt/ros/noetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/usr/include/eigen3 -I/usr/include/bullet    -o CMakeFiles/trajectory_visualization.dir/src/trajectory_visualization.cpp.o -c /home/fildo/Zad4/src/trajectory_visualization/src/trajectory_visualization.cpp",
+  "file": "/home/fildo/Zad4/src/trajectory_visualization/src/trajectory_visualization.cpp"
+}
+]
