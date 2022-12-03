@@ -46,5 +46,11 @@ int main(int argc, char **argv)
     Eigen::Vector3d x1 = {1,2,3};
     Eigen::Vector3d x2 = {1,0,0};
     ROS_INFO_STREAM(" [1,2,3] x [1,0,0] = \n" << x1.cross(x2));
+    Eigen::MatrixXd m5(4,4);
+    m5 << 1, 0,0,0,
+          0,1,0,0,
+          1,1,1,1,
+          0,1,2,3;
+    ROS_INFO_STREAM("m5^-1\n" << m5.inverse());
     return 0;
 }

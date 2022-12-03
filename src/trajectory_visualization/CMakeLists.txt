@@ -17,7 +17,11 @@ include_directories(
 )
 
 
-add_executable(trajectory_visualization src/trajectory_visualization.cpp)
+add_executable(trajectory_visualization
+        src/trajectory_visualization.cpp
+        src/DerivativeMatrix.cpp
+        src/DerivativeMatrix.hpp
+)
 add_dependencies(trajectory_visualization ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(trajectory_visualization
         ${catkin_LIBRARIES}
