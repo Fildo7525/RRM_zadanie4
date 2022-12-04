@@ -1,7 +1,17 @@
 #include "DerivativeMatrix.hpp"
+#include <qsplineseries.h>
 
 std::fstream klby("/home/fildo/Zad4/src/trajectory_visualization/hodnoty.txt", std::ios::out);
 std::vector<std::vector<double>> data(8);
+
+QtCharts::QSplineSeries *position1 = new QtCharts::QSplineSeries();
+QtCharts::QSplineSeries *speed1 = new QtCharts::QSplineSeries();
+QtCharts::QSplineSeries *acceleration1 = new QtCharts::QSplineSeries();
+QtCharts::QSplineSeries *yank1 = new QtCharts::QSplineSeries();
+QtCharts::QSplineSeries *position2 = new QtCharts::QSplineSeries();
+QtCharts::QSplineSeries *speed2 = new QtCharts::QSplineSeries();
+QtCharts::QSplineSeries *acceleration2 = new QtCharts::QSplineSeries();
+QtCharts::QSplineSeries *yank2 = new QtCharts::QSplineSeries();
 
 Eigen::MatrixXd sixBySixDerivative(int t0, int t2)
 {
@@ -100,10 +110,10 @@ void wiriteTrajectory(moveit_msgs::RobotTrajectory &trajectory,
 		point.accelerations[0] = jointOneData(2);
 		// ROS_INFO_STREAM("J1 at " << t << "\n" << jointOneData);
 		ROS_INFO_STREAM("J3 at " << t << "\n" << jointOneData);
-		data[0].push_back(jointOneData(0));
-		data[1].push_back(jointOneData(1));
-		data[2].push_back(jointOneData(2));
-		data[3].push_back(jointOneData(3));
+		position1->append(t, jointOneData(0));
+		speed1->append(t, jointOneData(1));
+		acceleration1->append(t, jointOneData(2));
+		yank1->append(t, jointOneData(3));
 
 
 		// Klb 2
@@ -117,10 +127,10 @@ void wiriteTrajectory(moveit_msgs::RobotTrajectory &trajectory,
 		point.velocities[2] = jointThreeData(1);
 		point.accelerations[2] = jointThreeData(2);
 		ROS_INFO_STREAM("J3 at " << t << "\n" << jointThreeData);
-		data[4].push_back(jointThreeData(0));
-		data[5].push_back(jointThreeData(1));
-		data[6].push_back(jointThreeData(2));
-		data[7].push_back(jointThreeData(3));
+		position2->append(t, jointThreeData(0));
+		speed2->append(t, jointThreeData(1));
+		acceleration2->append(t, jointThreeData(2));
+		yank2->append(t, jointThreeData(3));
 
 		// Klb 4
 		point.positions[3] = 0;
