@@ -9,6 +9,11 @@ find_package(catkin REQUIRED COMPONENTS
         moveit_ros_planning_interface
         )
 
+find_package(Qt5 REQUIRED COMPONENTS
+        Widgets
+        Charts
+)
+
 catkin_package()
 
 include_directories(
@@ -25,4 +30,6 @@ add_executable(trajectory_visualization
 add_dependencies(trajectory_visualization ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(trajectory_visualization
         ${catkin_LIBRARIES}
-        )
+        Qt5::Widgets
+        Qt5::Charts
+)
