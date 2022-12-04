@@ -40,20 +40,6 @@ Eigen::VectorXd calculateAParams(double startTime, double endTime, Eigen::Matrix
 	return pointOneAParams;
 }
 
-std::vector<double> calculateRobotJoint3Variables(double t, Eigen::VectorXd a)
-{
-	std::vector<double> q;
-	// Position
-	q.push_back(a[0] + a[1]*std::pow(t,1) + a[2]*std::pow(t,2) + a[3]*std::pow(t,3) + a[4]*std::pow(t,4) + a[5]*std::pow(t,5));
-	// Velocity
-	q.push_back(a[1] + 2*a[2]*std::pow(t,1) + 3*a[3]*std::pow(t,2) + 4*a[4]*std::pow(t,3) + 5*a[5]*std::pow(t,4));
-	// Acceleration
-	q.push_back(2*a[2] + 6*a[3]*std::pow(t,1) + 12*a[4]*std::pow(t,2) + 20*a[5]*std::pow(t,3));
-	// Yank
-	q.push_back(6*a[3] + 24*a[4]*std::pow(t,1) + 60*a[5]*std::pow(t,2));
-	return q;
-}
-
 Eigen::MatrixXd calcultateData(Eigen::MatrixXd a, const double time)
 {
 	Eigen::MatrixXd dataPoint(4,1);

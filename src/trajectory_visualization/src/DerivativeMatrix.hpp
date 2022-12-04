@@ -20,7 +20,6 @@ Eigen::MatrixXd sixBySixDerivative(int t0, int t2);
 Eigen::MatrixXd nineByNineDerivative(int t0, int t1, int t2);
 
 Eigen::VectorXd calculateAParams(double startTime, double endTime, Eigen::MatrixXd &&pointFinal);
-std::vector<double> calculateRobotJoint3Variables(double t, Eigen::VectorXd a);
 Eigen::MatrixXd calcultateData(Eigen::MatrixXd a, const double time);
 void wiriteTrajectory(moveit_msgs::RobotTrajectory &trajectory,
 					  double startTime,
