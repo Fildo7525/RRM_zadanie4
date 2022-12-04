@@ -1,8 +1,15 @@
 #include "DerivativeMatrix.hpp"
 #include <algorithm>
+#include <qchart.h>
+#include <qchartview.h>
 #include <utility>
 #include <vector>
 #include <iterator>
+
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QMainWindow>
+#include <QtCharts/QChartView>
+#include <QtCharts/QSplineSeries>
 
 /**
  * Vypocitajte koeficienty a;
@@ -25,6 +32,16 @@
 
 int main(int argc, char **argv)
 {
+	QApplication a(argc, argv);
+	position1->setName("position");
+	speed1->setName("speed");
+	acceleration1->setName("acceleration");
+	yank1->setName("yank");
+	position2->setName("position");
+	speed2->setName("speed");
+	acceleration2->setName("acceleration");
+	yank2->setName("yank");
+
 	// Vytvorenie node a publishera
 	ros::init(argc, argv, "trajectory_visualization");
 	ros::NodeHandle n;
@@ -72,11 +89,42 @@ int main(int argc, char **argv)
 	// Potrebne vyplnit nazov modelu
 	display_trajectory.model_id = "abb_irb";
 
-	for(auto var : data) {
-		std::copy(var.cbegin(), var.cend(), std::ostream_iterator<double>(klby, "\n"));
-		klby << '\n';
-	}
-	klby.close();
+	QtCharts::QChart *firstJoint = new QtCharts::QChart();
+	firstJoint->addSeries(position1);
+	firstJoint->addSeries(speed1);
+	firstJoint->addSeries(acceleration1);
+	firstJoint->addSeries(yank1);
+	firstJoint->setTitle("Joint One position and its derivatives");
+	firstJoint->createDefaultAxes();
+	firstJoint->axes(Qt::Horizontal).first()->setRange(0, 4);
+	firstJoint->axes(Qt::Horizontal).first()->setTitleText("Time (s)");
+	firstJoint->axes(Qt::Vertical).first()->setTitleText("Position (rad), Speed (rad/s), Acceleration (rad/s^2), Yank (rad/s^3)");
+	QtCharts::QChartView *chartView1 = new QtCharts::QChartView(firstJoint);
+
+	QtCharts::QChart *thirdJoint = new QtCharts::QChart();
+	thirdJoint->addSeries(position2);
+	thirdJoint->addSeries(speed2);
+	thirdJoint->addSeries(acceleration2);
+	thirdJoint->addSeries(yank2);
+	thirdJoint->setTitle("Joint Three position and its derivatives");
+	thirdJoint->createDefaultAxes();
+	thirdJoint->axes(Qt::Horizontal).first()->setRange(0, 4);
+	thirdJoint->axes(Qt::Vertical).first()->setTitleText("Position (rad), Speed (rad/s), Acceleration (rad/s^2), Yank (rad/s^3)");
+	thirdJoint->axes(Qt::Horizontal).first()->setTitleText("Time (s)");
+	QtCharts::QChartView *chartView = new QtCharts::QChartView(thirdJoint);
+
+	QMainWindow w;
+	w.setCentralWidget(chartView1);
+	w.resize(1000, 900);
+	w.show();
+
+	QMainWindow w2;
+	w2.setCentralWidget(chartView);
+	w2.resize(1000, 900);
+	w2.show();
+
+	a.exec();
+
 	// Vlozenie vypocitanej trajektorie
 	display_trajectory.trajectory.push_back(trajectory);
 

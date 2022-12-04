@@ -1,5 +1,6 @@
 #pragma once
 
+#include <qsplineseries.h>
 #include <ros/ros.h>
 
 #include <Eigen/Core>
@@ -8,12 +9,23 @@
 #include <cmath>
 #include <fstream>
 
+#include <QSplineSeries>
+
 #define T0 0
 #define T1 2
 #define T2 4
 
 extern std::fstream klby;
 extern std::vector<std::vector<double>> data;
+extern QtCharts::QSplineSeries *position1;
+extern QtCharts::QSplineSeries *speed1;
+extern QtCharts::QSplineSeries *acceleration1;
+extern QtCharts::QSplineSeries *yank1;
+extern QtCharts::QSplineSeries *position2;
+extern QtCharts::QSplineSeries *speed2;
+extern QtCharts::QSplineSeries *acceleration2;
+extern QtCharts::QSplineSeries *yank2;
+
 
 
 Eigen::MatrixXd sixBySixDerivative(int t0, int t2);

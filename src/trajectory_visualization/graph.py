@@ -16,13 +16,17 @@ ynk2 = []
 
 time = []
 
-def eavenPlot(x, y):
+def eavenPlot(x, y, yLabel, Title):
     global i
     cubic_interpolation_model = interp1d(x, y, kind = "cubic")
     X_=np.linspace(min(x), max(x), 500)
     Y_=cubic_interpolation_model(X_)
     plt.figure(i)
     plt.plot(X_, Y_);
+    plt.xlabel('time (s)')
+    plt.ylabel(yLabel)
+    plt.title(Title)
+    plt.grid(True)
     i+=1
 
 with open('./src/trajectory_visualization/hodnoty.txt') as file:
@@ -43,16 +47,16 @@ with open('./src/trajectory_visualization/hodnoty.txt') as file:
     ynk2 = [file.readline() for _ in range(0,40)]
     file.readline()
 
-time = [i for i in range(0, len(pos2))]
+time = [i/10 for i in range(0, len(pos2))]
 
-eavenPlot(time, pos1);
-eavenPlot(time, vel1);
-eavenPlot(time, acc1);
-eavenPlot(time, ynk1);
-eavenPlot(time, pos2);
-eavenPlot(time, vel2);
-eavenPlot(time, acc2);
-eavenPlot(time, ynk2);
+eavenPlot(time, pos1, "Position (rad)", "First joint position");
+eavenPlot(time, vel1, "Velocity (rad/s)", "First joint velocity");
+eavenPlot(time, acc1, "Acceleration (rad/s^2)", "First joint acceleration");
+eavenPlot(time, ynk1, "Yank (rad/s^3)", "First joint yank");
+eavenPlot(time, pos2, "Position (rad)", "Third joint position");
+eavenPlot(time, vel2, "Velocity (rad/s)", "Third joint position");
+eavenPlot(time, acc2, "Acceleration (rad/s^2)", "Third joint position");
+eavenPlot(time, ynk2, "Yank (rad/s^3)", "Third joint position");
 
 plt.show()
 
