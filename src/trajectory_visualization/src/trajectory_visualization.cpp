@@ -60,7 +60,7 @@ int main(int argc, char **argv)
 
 	ROS_INFO_STREAM("Joint two calc pt1");
 	Eigen::MatrixXd j3pt1(6,1);
-	j3pt1 << 0, 0, 0, M_PI/3, 0, 0;
+	j3pt1 << 0, 0, 0, M_PI/6, 0, 0;
 	Eigen::VectorXd jointThree = calculateAParams(T0, T1, std::move(j3pt1));
 
 
@@ -73,7 +73,7 @@ int main(int argc, char **argv)
 
 	ROS_INFO_STREAM("Calculation joint two pt 2");
 	Eigen::MatrixXd j3pt2(6,1);
-	j3pt2 << M_PI/3, 0, 0, 0, 0, 0;
+	j3pt2 << M_PI/6, 0, 0, 0, 0, 0;
 	jointThree = calculateAParams(T1, T2, std::move(j3pt2));
 
 

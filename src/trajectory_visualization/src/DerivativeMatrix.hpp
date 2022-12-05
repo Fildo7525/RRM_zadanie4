@@ -11,7 +11,7 @@
 #include <QSplineSeries>
 
 #define T0 0
-#define T1 2
+#define T1 1
 #define T2 4
 
 extern QtCharts::QSplineSeries *position1;
