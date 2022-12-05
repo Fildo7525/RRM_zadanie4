@@ -28,9 +28,9 @@ int main(int argc, char **argv)
 	tf::poseEigenToMsg(target, target_msg);
 
 	// Premenne vystupujuce vo funkcii getPositionIK
-	std::vector<geometry_msgs::Pose> ik_poses = {target_msg};   // Vlozenie cielu do pola
-	std::vector<std::vector<double> > solutions;				// Vystup z funkcie s mnozinou rieseni
-	std::vector<double> ik_seed_state = {0,0,0,0,0,0};		  // Odhadovane riesenie - potrebne iba pre analyticke algoritmy
+	std::vector<geometry_msgs::Pose> ik_poses = {target_msg};	// Vlozenie cielu do pola
+	std::vector<std::vector<double>> solutions;					// Vystup z funkcie s mnozinou rieseni
+	std::vector<double> ik_seed_state = {0,0,0,0,0,0};			// Odhadovane riesenie - potrebne iba pre analyticke algoritmy
 	kinematics::KinematicsResult result;						// exit_code z funkcie (ci bol vypocet uspesny)
 
 	// Vypocet inverznej kinematiky

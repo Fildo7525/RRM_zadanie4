@@ -75,7 +75,6 @@ void wiriteTrajectory(moveit_msgs::RobotTrajectory &trajectory,
 {
 	ROS_INFO_STREAM("Calculation " << startTime << " - " << endTime << " second");
 	for (double t = startTime; t <= endTime; t += 0.1) {
-
 		// Vytvorenie prejazdoveho bodu
 		trajectory_msgs::JointTrajectoryPoint point;
 
