@@ -1,25 +1,34 @@
 #pragma once
 
-#include <qsplineseries.h>
-#include <ros/ros.h>
+#include <QSplineSeries>
 
+#include <ros/ros.h>
+#include <eigen_conversions/eigen_msg.h>
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <moveit_msgs/DisplayTrajectory.h>
-#include <cmath>
+#include <moveit/robot_model_loader/robot_model_loader.h>
 
-#include <QSplineSeries>
+#include <cmath>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
+
 
 #define T0 0
 #define T1 1
-#define T2 4
+#define T2 2
+#define T3 3
+#define T4 4
+#define T5 5
+#define T6 9
 
-extern QtCharts::QSplineSeries *position1;
-extern QtCharts::QSplineSeries *speed1;
-extern QtCharts::QSplineSeries *acceleration1;
-extern QtCharts::QSplineSeries *yank1;
-extern QtCharts::QSplineSeries *position2;
-extern QtCharts::QSplineSeries *speed2;
+extern QtCharts::QSplineSeries *zPose;
+extern QtCharts::QSplineSeries *zSpeed;
+extern QtCharts::QSplineSeries *zAcc;
+extern QtCharts::QSplineSeries *yPose;
+extern QtCharts::QSplineSeries *ySpeed;
+extern QtCharts::QSplineSeries *yAcc;
 extern QtCharts::QSplineSeries *acceleration2;
 extern QtCharts::QSplineSeries *yank2;
 
@@ -33,5 +42,7 @@ void wiriteTrajectory(moveit_msgs::RobotTrajectory &trajectory,
 					  double startTime,
 					  double endTime,
 					  const Eigen::MatrixXd &jointOne,
-					  const Eigen::MatrixXd &jointThree);
+					  const Eigen::MatrixXd &jointThree,
+					  const int zyr);
+std::vector<double> solutionFromIkconst(const Eigen::Vector3d &position, double rx, double ry, double rz);
 

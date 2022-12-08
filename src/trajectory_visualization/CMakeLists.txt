@@ -6,6 +6,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(catkin REQUIRED COMPONENTS
         roscpp
 #        moveit_core
+        eigen_conversions
         moveit_ros_planning_interface
         )
 
@@ -13,6 +14,8 @@ find_package(Qt5 REQUIRED COMPONENTS
         Widgets
         Charts
 )
+
+find_package(Eigen3 REQUIRED)
 
 catkin_package()
 
