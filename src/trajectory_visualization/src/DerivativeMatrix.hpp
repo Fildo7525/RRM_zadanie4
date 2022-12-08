@@ -29,8 +29,7 @@ extern QtCharts::QSplineSeries *zAcc;
 extern QtCharts::QSplineSeries *yPose;
 extern QtCharts::QSplineSeries *ySpeed;
 extern QtCharts::QSplineSeries *yAcc;
-extern QtCharts::QSplineSeries *acceleration2;
-extern QtCharts::QSplineSeries *yank2;
+extern QtCharts::QSplineSeries *zRotation;
 
 Eigen::MatrixXd fourByFourDerivative(int t0, int t2);
 Eigen::MatrixXd fiveByFiveDerivative(int t0, int t1, int t2);
@@ -38,11 +37,11 @@ Eigen::MatrixXd sixBySixDerivative(int t0, int t2);
 
 Eigen::VectorXd calculateAParams(double startTime, double endTime, Eigen::MatrixXd &&pointFinal, int matrixSize, double midTime = 0);
 Eigen::MatrixXd calcultateData(Eigen::MatrixXd a, const double time);
-void wiriteTrajectory(moveit_msgs::RobotTrajectory &trajectory,
+void writeTrajectory(moveit_msgs::RobotTrajectory &trajectory,
 					  double startTime,
 					  double endTime,
-					  const Eigen::MatrixXd &jointOne,
-					  const Eigen::MatrixXd &jointThree,
-					  const int zyr);
+					  std::function<std::vector<double>(double)> motion,
+					  const Eigen::MatrixXd &stop);
 std::vector<double> solutionFromIkconst(const Eigen::Vector3d &position, double rx, double ry, double rz);
+void writeToChart(int zyr, Eigen::MatrixXd data, double t);
 

@@ -16,13 +16,6 @@ double n_ySpeed = 0;
 double n_yAcc = 0;
 double n_zRotation = 0;
 
-// Vytvorenie modelu z urdf
-robot_model_loader::RobotModelLoader loader("robot_description");
-
-// Vyber move group a IK algoritmu
-robot_state::JointModelGroup* joint_model_group = loader.getModel()->getJointModelGroup("robot");
-const kinematics::KinematicsBaseConstPtr& solver = joint_model_group->getSolverInstance();
-
 Eigen::MatrixXd fourByFourDerivative(int t0, int t2)
 {
 	Eigen::MatrixXd point(4, 4);
@@ -148,12 +141,11 @@ void writeToChart(int zyr, Eigen::MatrixXd data, double t)
 	}
 }
 
-void wiriteTrajectory(moveit_msgs::RobotTrajectory &trajectory,
+void writeTrajectory(moveit_msgs::RobotTrajectory &trajectory,
 					  double startTime,
 					  double endTime,
-					  const Eigen::MatrixXd &motion,
-					  const Eigen::MatrixXd &stop,
-					  const int zyr)
+					  std::function<std::vector<double>(double)> motion,
+					  const Eigen::MatrixXd &stop)
 {
 	ROS_INFO_STREAM("Calculation " << startTime << " - " << endTime << " second");
 	for (double t = startTime; t <= endTime; t += 0.1) {
@@ -161,17 +153,7 @@ void wiriteTrajectory(moveit_msgs::RobotTrajectory &trajectory,
 		trajectory_msgs::JointTrajectoryPoint point;
 
 		// move it to lambda argument
-		auto data = calcultateData(motion, t);
-		writeToChart(zyr, data, t);
-
-		std::vector<double> rotation;
-		if (zyr == 1) {
-			rotation = solutionFromIkconst({1, 0, data(0)}, 0, M_PI/2., 0);
-		} else if (zyr == 2) {
-			rotation = solutionFromIkconst({1, data(0), 1}, 0, M_PI/2., 0);
-		} else if (zyr == 3) {
-			rotation = solutionFromIkconst({1, 0, 1}, 0, M_PI/2., data(0));
-		}
+		auto rotation = motion(t);
 
 		// Robot ma 6 klbov
 		point.positions.resize(6);
@@ -206,11 +188,18 @@ void wiriteTrajectory(moveit_msgs::RobotTrajectory &trajectory,
 
 std::vector<double> pickSolution(std::vector<std::vector<double>> solutions)
 {
-	return solutions[1];
+	return solutions[0];
 }
 
-std::vector<double> solutionFromIkconst(Eigen::Vector3d &position, double rx, double ry, double rz)
+std::vector<double> solutionFromIkconst(const Eigen::Vector3d &position, double rx, double ry, double rz)
 {
+	// Vytvorenie modelu z urdf
+	robot_model_loader::RobotModelLoader loader("robot_description");
+
+	// Vyber move group a IK algoritmu
+	robot_state::JointModelGroup* joint_model_group = loader.getModel()->getJointModelGroup("robot");
+	const kinematics::KinematicsBaseConstPtr& solver = joint_model_group->getSolverInstance();
+
 	// Vytvorenie cielovej polohy x = 1.27, y = 0.0, z = 1.0, rx = 0.0, ry = 1.57, rz = 0.0
 	Eigen::Affine3d target = Eigen::Translation3d(position)*
 							Eigen::AngleAxisd(rx, Eigen::Vector3d::UnitX())*
