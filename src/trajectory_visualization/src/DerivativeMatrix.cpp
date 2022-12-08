@@ -10,6 +10,27 @@ QtCharts::QSplineSeries *speed2 = new QtCharts::QSplineSeries();
 QtCharts::QSplineSeries *acceleration2 = new QtCharts::QSplineSeries();
 QtCharts::QSplineSeries *yank2 = new QtCharts::QSplineSeries();
 
+Eigen::MatrixXd fourByFourDerivative(int t0, int t2)
+{
+	Eigen::MatrixXd point(4, 4);
+	point << 1,   t0, std::pow(t0, 2),	  std::pow(t0, 3),
+			 0,    1,			 2*t0,  3*std::pow(t0, 2),
+			 1,   t2, std::pow(t2, 2),	  std::pow(t2, 3),
+			 0,    1,			 2*t2,  3*std::pow(t2, 2);
+	return point;
+}
+
+Eigen::MatrixXd fiveByFiveDerivative(int t0, int t1, int t2)
+{
+	Eigen::MatrixXd point(5, 5);
+	point << 1,   t0, std::pow(t0, 2),	  std::pow(t0, 3),	  std::pow(t0, 4),
+			 0,    1,			 2*t0,  3*std::pow(t0, 2),  4*std::pow(t0, 3),
+			 1,   t1, std::pow(t1, 2),	  std::pow(t1, 3),	  std::pow(t1, 4),
+			 1,   t2, std::pow(t2, 2),	  std::pow(t2, 3),	  std::pow(t2, 4),
+			 0,    1,			 2*t2,  3*std::pow(t2, 2),  4*std::pow(t2, 3);
+	return point;
+}
+
 Eigen::MatrixXd sixBySixDerivative(int t0, int t2)
 {
 	Eigen::MatrixXd point(6, 6);
@@ -22,9 +43,20 @@ Eigen::MatrixXd sixBySixDerivative(int t0, int t2)
 	return point;
 }
 
-Eigen::VectorXd calculateAParams(double startTime, double endTime, Eigen::MatrixXd &&pointFinal)
+Eigen::VectorXd calculateAParams(double startTime, double endTime, Eigen::MatrixXd &&pointFinal, int matrixSize, double midTime)
 {
-	Eigen::MatrixXd pointOne = sixBySixDerivative(startTime, endTime);
+	Eigen::MatrixXd pointOne;
+	switch (matrixSize) {
+		case 4:
+			pointOne = fourByFourDerivative(startTime, endTime);
+			break;
+		case 5:
+			pointOne = fiveByFiveDerivative(startTime, midTime, endTime);
+			break;
+		case 6:
+			pointOne = sixBySixDerivative(startTime, endTime);
+			break;
+	}
 	Eigen::VectorXd pointOneAParams;
 
 	pointOneAParams = pointOne.inverse() * pointFinal;

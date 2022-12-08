@@ -52,16 +52,16 @@ int main(int argc, char **argv)
 	// Mena klbov musia byt vyplnene
 	trajectory.joint_trajectory.joint_names = {"joint_1", "joint_2", "joint_3", "joint_4", "joint_5", "joint_6"};
 
-	ROS_INFO_STREAM("Joint one calc");
-	Eigen::MatrixXd j1(6,1);
-	j1 << 0, 0, 0, M_PI/2, 0, 0;
+	ROS_INFO_STREAM("Move down by z");
+	Eigen::MatrixXd j1(4,1);
+	j1 << 1.6, 0, 1, 0;
 	ROS_INFO_STREAM("Base data set");
-	Eigen::VectorXd jointOne = calculateAParams(T0, T2, std::move(j1));
+	Eigen::VectorXd jointOne = calculateAParams(T0, T1, std::move(j1), 4);
 
-	ROS_INFO_STREAM("Joint two calc pt1");
-	Eigen::MatrixXd j3pt1(6,1);
-	j3pt1 << 0, 0, 0, M_PI/6, 0, 0;
-	Eigen::VectorXd jointThree = calculateAParams(T0, T1, std::move(j3pt1));
+	ROS_INFO_STREAM("Rotate around z");
+	Eigen::MatrixXd j3pt1(4,1);
+	j3pt1 << 0, 0, M_PI/6, 0;
+	Eigen::VectorXd jointThree = calculateAParams(T1, T2, std::move(j3pt1), 4);
 
 
 
@@ -74,7 +74,7 @@ int main(int argc, char **argv)
 	ROS_INFO_STREAM("Calculation joint two pt 2");
 	Eigen::MatrixXd j3pt2(6,1);
 	j3pt2 << M_PI/6, 0, 0, 0, 0, 0;
-	jointThree = calculateAParams(T1, T2, std::move(j3pt2));
+	jointThree = calculateAParams(T1, T2, std::move(j3pt2), 4);
 
 
 
