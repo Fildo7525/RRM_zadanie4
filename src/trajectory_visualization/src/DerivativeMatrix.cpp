@@ -114,40 +114,22 @@ Eigen::MatrixXd calcultateData(Eigen::MatrixXd a, const double time)
 	return dataPoint;
 }
 
-void writeToChart(int zyr, Eigen::MatrixXd data, double t)
+void writeToChart(double z, double dz, double d2z, double y, double dy, double d2y, double rz, double t)
 {
-	if (zyr == 1) {
-		zPose->append(t, data(0));
-		n_zPose = data(0);
-		zSpeed->append(t, data(1));
-		n_zSpeed = data(1);
-		zAcc->append(t, data(2));
-		n_zAcc = data(2);
-		yPose->append(t, n_yPose);
-		ySpeed->append(t, n_ySpeed);
-		yAcc->append(t, n_yAcc);
-		zRotation->append(t, n_zRotation);
-	} else if (zyr == 2) {
-		zPose->append(t, n_zPose);
-		zSpeed->append(t, n_zSpeed);
-		zAcc->append(t, n_zAcc);
-		yPose->append(t, data(0));
-		n_yPose = data(0);
-		ySpeed->append(t, data(1));
-		n_ySpeed = data(1);
-		yAcc->append(t, data(2));
-		n_yAcc = data(2);
-		zRotation->append(t, n_zRotation);
-	} else if (zyr == 3) {
-		zPose->append(t, n_zPose);
-		zSpeed->append(t, n_zSpeed);
-		zAcc->append(t, n_zAcc);
-		yPose->append(t, n_yPose);
-		ySpeed->append(t, n_ySpeed);
-		yAcc->append(t, n_yAcc);
-		zRotation->append(t, data(0));
-		n_zRotation = data(0);
-	}
+	zPose->append(t, z);
+	n_zPose = z;
+	zSpeed->append(t, dz);
+	n_zSpeed = dz;
+	zAcc->append(t, d2z);
+	n_zAcc = d2z;
+	yPose->append(t, y);
+	n_yPose = y;
+	ySpeed->append(t, dy);
+	n_ySpeed = dy;
+	yAcc->append(t, d2y);
+	n_yAcc = d2y;
+	zRotation->append(t, rz);
+	n_zRotation = rz;
 }
 
 void writeTrajectory(moveit_msgs::RobotTrajectory &trajectory,
