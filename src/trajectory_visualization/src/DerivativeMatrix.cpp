@@ -1,4 +1,5 @@
 #include "DerivativeMatrix.hpp"
+#include <limits>
 #include <vector>
 
 QtCharts::QSplineSeries *zPose = new QtCharts::QSplineSeries();
@@ -15,6 +16,14 @@ double n_yPose = 0;
 double n_ySpeed = 0;
 double n_yAcc = 0;
 double n_zRotation = 0;
+double xLast;
+double yLast;
+double zLast;
+double rxLast;
+double ryLast;
+double rzLast;
+std::vector<double> lastSolution;
+std::vector<double> SolutionCalculationHelper(6, 0);
 
 Eigen::MatrixXd fourByFourDerivative(int t0, int t2)
 {
@@ -37,15 +46,15 @@ Eigen::MatrixXd fiveByFiveDerivative(int t0, int t1, int t2)
 	return point;
 }
 
-Eigen::MatrixXd sixBySixDerivative(int t0, int t2)
+Eigen::MatrixXd sixBySixDerivative(int t0, int t1, int t2)
 {
 	Eigen::MatrixXd point(6, 6);
 	point << 1,   t0, std::pow(t0, 2),	  std::pow(t0, 3),	  std::pow(t0, 4),	  std::pow(t0, 5),
 			 0,    1,			 2*t0,  3*std::pow(t0, 2),  4*std::pow(t0, 3),  5*std::pow(t0, 4),
-			 0,	   0,				2,				 6*t0, 12*std::pow(t0, 2), 20*std::pow(t0, 3),
+			 1,   t1, std::pow(t1, 2),	  std::pow(t1, 3),	  std::pow(t1, 4),	  std::pow(t1, 5),
+			 0,    1,			 2*t1,  3*std::pow(t1, 2),  4*std::pow(t1, 3),  5*std::pow(t1, 4),
 			 1,   t2, std::pow(t2, 2),	  std::pow(t2, 3),	  std::pow(t2, 4),	  std::pow(t2, 5),
-			 0,    1,			 2*t2,  3*std::pow(t2, 2),  4*std::pow(t2, 3),  5*std::pow(t2, 4),
-			 0,    0,				2,				 6*t2, 12*std::pow(t2, 2), 20*std::pow(t2, 3);
+			 0,    1,			 2*t2,  3*std::pow(t2, 2),  4*std::pow(t2, 3),  5*std::pow(t2, 4);
 	return point;
 }
 
@@ -60,7 +69,7 @@ Eigen::VectorXd calculateAParams(double startTime, double endTime, Eigen::Matrix
 			pointOne = fiveByFiveDerivative(startTime, midTime, endTime);
 			break;
 		case 6:
-			pointOne = sixBySixDerivative(startTime, endTime);
+			pointOne = sixBySixDerivative(startTime, midTime, endTime);
 			break;
 	}
 	Eigen::VectorXd pointOneAParams;
@@ -186,9 +195,26 @@ void writeTrajectory(moveit_msgs::RobotTrajectory &trajectory,
 	}
 }
 
-std::vector<double> pickSolution(std::vector<std::vector<double>> solutions)
+std::vector<double> pickSolution(const std::vector<std::vector<double>> &solutions)
 {
-	return solutions[0];
+	std::vector<double> bestSolution;
+	double nearest = std::numeric_limits<double>::max();
+
+	for(auto s : solutions) {
+		double tmp = 0;
+		for (size_t i = 0; i < s.size(); i++) {
+			tmp += std::abs(SolutionCalculationHelper[i] - s[i]);
+		}
+
+		if (tmp < nearest) {
+			nearest = tmp;
+			tmp = 0;
+			bestSolution = s;
+		}
+
+	}
+	lastSolution = bestSolution;
+	return bestSolution;
 }
 
 std::vector<double> solutionFromIkconst(const Eigen::Vector3d &position, double rx, double ry, double rz)
@@ -205,6 +231,12 @@ std::vector<double> solutionFromIkconst(const Eigen::Vector3d &position, double 
 							Eigen::AngleAxisd(rx, Eigen::Vector3d::UnitX())*
 							Eigen::AngleAxisd(ry, Eigen::Vector3d::UnitY())*
 							Eigen::AngleAxisd(rz, Eigen::Vector3d::UnitZ());
+	xLast = position(0);
+	yLast = position(1);
+	zLast = position(2);
+	rxLast = rx;
+	ryLast = ry;
+	rzLast = rz;
 
 	// Konverzia z Eigen do geometry_msgs
 	geometry_msgs::Pose target_msg;

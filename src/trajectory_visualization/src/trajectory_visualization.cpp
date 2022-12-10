@@ -90,26 +90,18 @@ int main(int argc, char **argv)
 		writeTrajectory(trajectory, T1, T2, [&] (double t) {
 					   auto data = calcultateData(firstMotion, t);
 					   writeToChart(1, data, t);
-					   return solutionFromIkconst({1, 0, data(0)}, 0, M_PI/2., 0);
+					   return solutionFromIkconst({1, 0, zLast}, 0, M_PI/2., data(0));
 				   }, conditions);
 	}
 
 	{
 		ROS_INFO_STREAM("wate for one second");
-		Eigen::MatrixXd conditions(4,1);
-		conditions << 0, 0, M_PI/2., 0;
-		ROS_INFO_STREAM("Base data set");
-		Eigen::VectorXd firstMotion = calculateAParams(T2, T3, std::move(conditions), 4);
-
 		ROS_INFO_STREAM("Calculation 2 - 3 second");
 		// V cykle sa vytvori trajektoria, kde pre ukazku kazdy klb bude mat hodnota q(t) = t*0.5
 		writeTrajectory(trajectory, T2, T3,
-				   		[&] (double t) { 
-							auto data = calcultateData(firstMotion, t);
-							writeToChart(1, data, t);
-							return solutionFromIkconst({1, 0, data(0)}, 0, M_PI/2., 0);
-					    },
-					    conditions);
+				   		[&] (double t) {
+					  		return lastSolution;
+					    },Eigen::MatrixXd());
 	}
 
 	{
@@ -120,17 +112,17 @@ int main(int argc, char **argv)
 		Eigen::VectorXd y = calculateAParams(T3, T5, std::move(conditions), 5, T4);
 
 		Eigen::MatrixXd conditions2(5,1);
-		conditions << 1, 0, 1, 1.6, 0;
+		conditions2 << 1, 0, 1, 1.6, 0;
 		ROS_INFO_STREAM("Calculation for z in  3 - 5 second");
 		Eigen::VectorXd z = calculateAParams(T3, T5, std::move(conditions2), 5, T4);
 
-		Eigen::MatrixXd conditions3(5,1);
-		conditions << M_PI/2., 0, M_PI/2., 0, 0;
+		Eigen::MatrixXd conditions3(6,1);
+		conditions3 << M_PI/2., 0, M_PI/2., 0, 0, 0;
 		ROS_INFO_STREAM("Calculation for rz in  3 - 5 second");
-		Eigen::VectorXd rz = calculateAParams(T3, T5, std::move(conditions3), 5, T4);
+		Eigen::VectorXd rz = calculateAParams(T3, T5, std::move(conditions3), 6, T4);
 
 		// V cykle sa vytvori trajektoria, kde pre ukazku kazdy klb bude mat hodnota q(t) = t*0.5
-		writeTrajectory(trajectory, T3, T4, [&] (double t) {
+		writeTrajectory(trajectory, T3, T5, [&] (double t) {
 							auto data = calcultateData(y, t);
 							auto data1 = calcultateData(z, t);
 							auto data2 = calcultateData(rz, t);
@@ -152,7 +144,7 @@ int main(int argc, char **argv)
 				   		[&] (double t) { 
 							auto data = calcultateData(firstMotion, t);
 							writeToChart(1, data, t);
-							return solutionFromIkconst({1, data(0), 1.6}, 0, M_PI/2., 0);
+							return solutionFromIkconst({1, data(0), zLast}, 0, M_PI/2., rzLast);
 					    },
 					    conditions);
 	}
@@ -168,7 +160,7 @@ int main(int argc, char **argv)
 	firstJoint->addSeries(zPose);
 	firstJoint->addSeries(zSpeed);
 	firstJoint->addSeries(zAcc);
-	firstJoint->setTitle("Joint One position and its derivatives");
+	firstJoint->setTitle("z axis");
 	firstJoint->createDefaultAxes();
 	firstJoint->axes(Qt::Horizontal).first()->setRange(0, 9);
 	QtCharts::QChartView *chartView1 = new QtCharts::QChartView(firstJoint);
@@ -177,7 +169,8 @@ int main(int argc, char **argv)
 	thirdJoint->addSeries(ySpeed);
 	thirdJoint->addSeries(yAcc);
 	thirdJoint->addSeries(yPose);
-	thirdJoint->setTitle("Joint Three position and its derivatives");
+	thirdJoint->addSeries(zRotation);
+	thirdJoint->setTitle("y axis and z rotation");
 	thirdJoint->createDefaultAxes();
 	thirdJoint->axes(Qt::Horizontal).first()->setRange(0, 9);
 	QtCharts::QChartView *chartView = new QtCharts::QChartView(thirdJoint);

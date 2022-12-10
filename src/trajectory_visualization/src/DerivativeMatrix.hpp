@@ -30,10 +30,17 @@ extern QtCharts::QSplineSeries *yPose;
 extern QtCharts::QSplineSeries *ySpeed;
 extern QtCharts::QSplineSeries *yAcc;
 extern QtCharts::QSplineSeries *zRotation;
+extern double xLast;
+extern double yLast;
+extern double zLast;
+extern double rxLast;
+extern double ryLast;
+extern double rzLast;
+extern std::vector<double> lastSolution;
 
 Eigen::MatrixXd fourByFourDerivative(int t0, int t2);
 Eigen::MatrixXd fiveByFiveDerivative(int t0, int t1, int t2);
-Eigen::MatrixXd sixBySixDerivative(int t0, int t2);
+Eigen::MatrixXd sixBySixDerivative(int t0, int t1, int t2);
 
 Eigen::VectorXd calculateAParams(double startTime, double endTime, Eigen::MatrixXd &&pointFinal, int matrixSize, double midTime = 0);
 Eigen::MatrixXd calcultateData(Eigen::MatrixXd a, const double time);
