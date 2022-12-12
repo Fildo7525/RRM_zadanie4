@@ -30,6 +30,8 @@ extern QtCharts::QSplineSeries *yPose;
 extern QtCharts::QSplineSeries *ySpeed;
 extern QtCharts::QSplineSeries *yAcc;
 extern QtCharts::QSplineSeries *zRotation;
+extern QtCharts::QSplineSeries *zRotationS;
+extern QtCharts::QSplineSeries *zRotationA;
 extern double n_zPose;
 extern double n_zSpeed;
 extern double n_zAcc;
@@ -37,6 +39,8 @@ extern double n_yPose;
 extern double n_ySpeed;
 extern double n_yAcc;
 extern double n_zRotation;
+extern double n_zRotationS;
+extern double n_zRotationA;
 extern double xLast;
 extern double yLast;
 extern double zLast;
@@ -57,5 +61,5 @@ void writeTrajectory(moveit_msgs::RobotTrajectory &trajectory,
 					  std::function<std::vector<double>(double)> motion,
 					  const Eigen::MatrixXd &stop);
 std::vector<double> solutionFromIkconst(const Eigen::Vector3d &position, double rx, double ry, double rz);
-void writeToChart(double z, double dz, double d2z, double y, double dy, double d2y, double rz, double t);
+void writeToChart(double z, double dz, double d2z, double y, double dy, double d2y, double rz, double drz, double d2rz, double t);
 

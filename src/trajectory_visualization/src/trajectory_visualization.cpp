@@ -40,7 +40,9 @@ int main(int argc, char **argv)
 	yPose->setName("y_pose");
 	ySpeed->setName("y_speed");
 	yAcc->setName("y_acceleration");
-	zRotation->setName("z_rotation");
+	zRotation->setName("z_rotationPosition");
+	zRotation->setName("z_rotationVelocity");
+	zRotation->setName("z_rotationAcceleration");
 
 	// Vytvorenie node a publishera
 	ros::init(argc, argv, "trajectory_visualization");
@@ -52,17 +54,6 @@ int main(int argc, char **argv)
 	// Mena klbov musia byt vyplnene
 	trajectory.joint_trajectory.joint_names = {"joint_1", "joint_2", "joint_3", "joint_4", "joint_5", "joint_6"};
 
-		// auto data = calcultateData(motion, t);
-		// writeToChart(zyr, data, t);
-		//
-		// std::vector<double> rotation;
-		// if (zyr == 1) {
-		// 	rotation = solutionFromIkconst({1, 0, data(0)}, 0, M_PI/2., 0);
-		// } else if (zyr == 2) {
-		// 	rotation = solutionFromIkconst({1, data(0), 1}, 0, M_PI/2., 0);
-		// } else if (zyr == 3) {
-		// 	rotation = solutionFromIkconst({1, 0, 1}, 0, M_PI/2., data(0));
-		// }
 	{
 		ROS_INFO_STREAM("Move down by z");
 		Eigen::MatrixXd conditions(4,1);
@@ -78,23 +69,23 @@ int main(int argc, char **argv)
 					   zSpeed->append(t, data(1));
 					   zAcc->append(t, data(2));
 					   yPose->append(t, yLast);
-					   writeToChart(data(0), data(1), data(2), yLast, n_ySpeed, n_yAcc, rzLast, t);
+					   writeToChart(data(0), data(1), data(2), yLast, n_ySpeed, n_yAcc, n_zRotation, n_zRotationS, n_zRotationA, t);
 					   return solutionFromIkconst({1, 0, data(0)}, 0, M_PI/2., 0);
 				   }, conditions);
 	}
 
 	{
 		ROS_INFO_STREAM("Rotate along z");
-		Eigen::MatrixXd conditions(4,1);
-		conditions << 0, 0, M_PI/2., 0;
+		Eigen::MatrixXd conditions(6,1);
+		conditions << 0, 0, 0, M_PI/2., 0, 0;
 		ROS_INFO_STREAM("Base data set");
-		Eigen::VectorXd firstMotion = calculateAParams(T1, T2, std::move(conditions), 4);
+		Eigen::VectorXd firstMotion = calculateAParams(T1, T2, std::move(conditions), 6);
 
 		ROS_INFO_STREAM("Calculation 1 - 2 second");
 		// V cykle sa vytvori trajektoria, kde pre ukazku kazdy klb bude mat hodnota q(t) = t*0.5
 		writeTrajectory(trajectory, T1, T2, [&] (double t) {
 					   auto data = calcultateData(firstMotion, t);
-					   writeToChart(n_zPose, n_zSpeed, n_zAcc, yLast, n_ySpeed, n_yAcc, data(0), t);
+					   writeToChart(n_zPose, n_zSpeed, n_zAcc, yLast, n_ySpeed, n_yAcc, data(0), data(1), data(2), t);
 					   return solutionFromIkconst({1, 0, zLast}, 0, M_PI/2., data(0));
 				   }, conditions);
 	}
@@ -105,7 +96,7 @@ int main(int argc, char **argv)
 		// V cykle sa vytvori trajektoria, kde pre ukazku kazdy klb bude mat hodnota q(t) = t*0.5
 		writeTrajectory(trajectory, T2, T3,
 				   		[&] (double t) {
-							writeToChart(n_zPose, n_zSpeed, n_zAcc, yLast, n_ySpeed, n_yAcc, n_zRotation, t);
+							writeToChart(n_zPose, n_zSpeed, n_zAcc, yLast, n_ySpeed, n_yAcc, n_zRotation, n_zRotationS, n_zRotationA, t);
 					  		return lastSolution;
 					    },Eigen::MatrixXd());
 	}
@@ -122,17 +113,17 @@ int main(int argc, char **argv)
 		ROS_INFO_STREAM("Calculation for z in  3 - 5 second");
 		Eigen::VectorXd z = calculateAParams(T3, T5, std::move(conditions2), 5, T4);
 
-		Eigen::MatrixXd conditions3(6,1);
-		conditions3 << M_PI/2., 0, M_PI/2., 0, 0, 0;
+		Eigen::MatrixXd conditions3(9,1);
+		conditions3 << M_PI/2., 0, 0, M_PI/2., 0, 0, 0, 0 ,0;
 		ROS_INFO_STREAM("Calculation for rz in  3 - 5 second");
-		Eigen::VectorXd rz = calculateAParams(T3, T5, std::move(conditions3), 6, T4);
+		Eigen::VectorXd rz = calculateAParams(T3, T5, std::move(conditions3), 9, T4);
 
 		// V cykle sa vytvori trajektoria, kde pre ukazku kazdy klb bude mat hodnota q(t) = t*0.5
 		writeTrajectory(trajectory, T3, T5, [&] (double t) {
 							auto data = calcultateData(y, t);
 							auto data1 = calcultateData(z, t);
 							auto data2 = calcultateData(rz, t);
-							writeToChart(data1(0), data1(1), data1(2), data(0), data(1), data(2), data2(0), t);
+							writeToChart(data1(0), data1(1), data1(2), data(0), data(1), data(2), data2(0), data2(1), data2(2), t);
 							return solutionFromIkconst({1, data(0), data1(0)}, 0, M_PI/2., data2(0));
 				   }, conditions);
 	}
@@ -149,7 +140,7 @@ int main(int argc, char **argv)
 		writeTrajectory(trajectory, T5, T6,
 				   		[&] (double t) {
 							auto data = calcultateData(firstMotion, t);
-							writeToChart(n_zPose, n_zSpeed, n_zAcc, data(0), data(1), data(2), n_zRotation, t);
+							writeToChart(n_zPose, n_zSpeed, n_zAcc, data(0), data(1), data(2), n_zRotation, n_zRotationS, n_zRotationA, t);
 							return solutionFromIkconst({1, data(0), zLast}, 0, M_PI/2., rzLast);
 					    },
 					    conditions);
@@ -177,13 +168,23 @@ int main(int argc, char **argv)
 	thirdJoint->addSeries(ySpeed);
 	thirdJoint->addSeries(yAcc);
 	thirdJoint->addSeries(yPose);
-	thirdJoint->addSeries(zRotation);
-	thirdJoint->setTitle("y axis and z rotation");
+	thirdJoint->setTitle("y axis");
 	thirdJoint->createDefaultAxes();
 	thirdJoint->axes(Qt::Horizontal).first()->setRange(0, 9);
 	thirdJoint->axes(Qt::Horizontal).first()->setTitleText("Time (s)");
 	thirdJoint->axes(Qt::Vertical).first()->setTitleText("Position (rad), Velocity (rad/s), Acceleration (rad/s^2)");
 	QtCharts::QChartView *chartView = new QtCharts::QChartView(thirdJoint);
+
+	QtCharts::QChart *zRotationChart = new QtCharts::QChart();
+	zRotationChart->addSeries(zRotation);
+	zRotationChart->addSeries(zRotationS);
+	zRotationChart->addSeries(zRotationA);
+	zRotationChart->setTitle("z rotation");
+	zRotationChart->createDefaultAxes();
+	zRotationChart->axes(Qt::Horizontal).first()->setRange(0, 9);
+	zRotationChart->axes(Qt::Horizontal).first()->setTitleText("Time (s)");
+	zRotationChart->axes(Qt::Vertical).first()->setTitleText("Position (rad), Velocity (rad/s), Acceleration (rad/s^2)");
+	QtCharts::QChartView *chartView2 = new QtCharts::QChartView(zRotationChart);
 
 	QMainWindow w;
 	w.setCentralWidget(chartView1);
@@ -194,6 +195,11 @@ int main(int argc, char **argv)
 	w2.setCentralWidget(chartView);
 	w2.resize(1000, 900);
 	w2.show();
+
+	QMainWindow w3;
+	w3.setCentralWidget(chartView2);
+	w3.resize(1000, 900);
+	w3.show();
 
 	a.exec();
 

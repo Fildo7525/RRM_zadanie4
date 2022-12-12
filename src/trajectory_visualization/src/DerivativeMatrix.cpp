@@ -9,6 +9,8 @@ QtCharts::QSplineSeries *yPose = new QtCharts::QSplineSeries();
 QtCharts::QSplineSeries *ySpeed = new QtCharts::QSplineSeries();
 QtCharts::QSplineSeries *yAcc = new QtCharts::QSplineSeries();
 QtCharts::QSplineSeries *zRotation = new QtCharts::QSplineSeries();
+QtCharts::QSplineSeries *zRotationS = new QtCharts::QSplineSeries();
+QtCharts::QSplineSeries *zRotationA = new QtCharts::QSplineSeries();
 double n_zPose = 1.6;
 double n_zSpeed = 0;
 double n_zAcc = 0;
@@ -16,6 +18,8 @@ double n_yPose = 0;
 double n_ySpeed = 0;
 double n_yAcc = 0;
 double n_zRotation = 0;
+double n_zRotationS = 0;
+double n_zRotationA = 0;
 double xLast;
 double yLast;
 double zLast;
@@ -58,6 +62,33 @@ Eigen::MatrixXd sixBySixDerivative(int t0, int t1, int t2)
 	return point;
 }
 
+Eigen::MatrixXd sixBySixDerivative(int t0, int t1)
+{
+	Eigen::MatrixXd point(6, 6);
+	point << 1,   t0, std::pow(t0, 2),	  std::pow(t0, 3),	  std::pow(t0, 4),	  std::pow(t0, 5),
+			 0,    1,			 2*t0,  3*std::pow(t0, 2),  4*std::pow(t0, 3),  5*std::pow(t0, 4),
+			 0,    0,				2,				 6*t0, 12*std::pow(t0, 2), 20*std::pow(t0, 3),
+			 1,   t1, std::pow(t1, 2),	  std::pow(t1, 3),	  std::pow(t1, 4),	  std::pow(t1, 5),
+			 0,    1,			 2*t1,  3*std::pow(t1, 2),  4*std::pow(t1, 3),  5*std::pow(t1, 4),
+			 0,    0,				2,				 6*t1, 12*std::pow(t1, 2), 20*std::pow(t1, 3);
+	return point;
+}
+
+Eigen::MatrixXd nineByNineDerivative(int t0, int t1, int t2)
+{
+	Eigen::MatrixXd point(9, 9);
+	point << 1,   t0, std::pow(t0, 2),	  std::pow(t0, 3),	  std::pow(t0, 4),	  std::pow(t0, 5),	  std::pow(t0, 6),	  std::pow(t0, 7),	  std::pow(t0, 8),
+			 0,    1,			 2*t0,  3*std::pow(t0, 2),  4*std::pow(t0, 3),  5*std::pow(t0, 4),	6*std::pow(t0, 5),	7*std::pow(t0, 6),	8*std::pow(t0, 7),
+			 0,    0,				2,				 6*t0, 12*std::pow(t0, 2), 20*std::pow(t0, 3), 30*std::pow(t0, 4), 42*std::pow(t0, 5), 56*std::pow(t0, 6),
+			 1,   t1, std::pow(t1, 2),	  std::pow(t1, 3),	  std::pow(t1, 4),	  std::pow(t1, 5),	  std::pow(t1, 6),	  std::pow(t1, 7),	  std::pow(t1, 8),
+			 0,    1,			 2*t1,  3*std::pow(t1, 2),  4*std::pow(t1, 3),  5*std::pow(t1, 4),	6*std::pow(t1, 5),	7*std::pow(t1, 6),	8*std::pow(t1, 7),
+			 0,    0,				2,				 6*t1, 12*std::pow(t1, 2), 20*std::pow(t1, 3), 30*std::pow(t1, 4), 42*std::pow(t1, 5), 56*std::pow(t1, 6),
+			 1,   t2, std::pow(t2, 2),	  std::pow(t2, 3),	  std::pow(t2, 4),	  std::pow(t2, 5),	  std::pow(t2, 6),	  std::pow(t2, 7),	  std::pow(t2, 8),
+			 0,    1,			 2*t2,  3*std::pow(t2, 2),  4*std::pow(t2, 3),  5*std::pow(t2, 4),	6*std::pow(t2, 5),	7*std::pow(t2, 6),	8*std::pow(t2, 7),
+			 0,    0,				2,				 6*t2, 12*std::pow(t2, 2), 20*std::pow(t2, 3), 30*std::pow(t2, 4), 42*std::pow(t2, 5), 56*std::pow(t2, 6);
+	return point;
+}
+
 Eigen::VectorXd calculateAParams(double startTime, double endTime, Eigen::MatrixXd &&pointFinal, int matrixSize, double midTime)
 {
 	Eigen::MatrixXd pointOne;
@@ -68,9 +99,16 @@ Eigen::VectorXd calculateAParams(double startTime, double endTime, Eigen::Matrix
 		case 5:
 			pointOne = fiveByFiveDerivative(startTime, midTime, endTime);
 			break;
-		case 6:
-			pointOne = sixBySixDerivative(startTime, midTime, endTime);
+		case 6: {
+			if (midTime == 0) {
+				pointOne = sixBySixDerivative(startTime, endTime);
+			} else {
+				pointOne = sixBySixDerivative(startTime, midTime, endTime);
+			}
 			break;
+		case 9:
+			pointOne = nineByNineDerivative(startTime, midTime, endTime);
+		}
 	}
 	Eigen::VectorXd pointOneAParams;
 
@@ -114,7 +152,7 @@ Eigen::MatrixXd calcultateData(Eigen::MatrixXd a, const double time)
 	return dataPoint;
 }
 
-void writeToChart(double z, double dz, double d2z, double y, double dy, double d2y, double rz, double t)
+void writeToChart(double z, double dz, double d2z, double y, double dy, double d2y, double rz, double drz, double d2rz, double t)
 {
 	zPose->append(t, z);
 	n_zPose = z;
@@ -130,6 +168,10 @@ void writeToChart(double z, double dz, double d2z, double y, double dy, double d
 	n_yAcc = d2y;
 	zRotation->append(t, rz);
 	n_zRotation = rz;
+	zRotationS->append(t, drz);
+	n_zRotationS = drz;
+	zRotationA->append(t, d2rz);
+	n_zRotationA = d2rz;
 }
 
 void writeTrajectory(moveit_msgs::RobotTrajectory &trajectory,
